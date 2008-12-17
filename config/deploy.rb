@@ -10,7 +10,7 @@ set :branch, "master"
 set :runner, user
 set :runner_admin, runner
 
-set :required_remote_gems, ['thor', 'rake', 'rack']
+set :required_remote_gems, ['thor', 'rake', 'rack'] # thor is required to run the merb:gem:redeploy task
 
 set :use_sudo, false
 
