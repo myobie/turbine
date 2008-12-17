@@ -10,6 +10,8 @@ set :branch, "master"
 set :runner, user
 set :runner_admin, runner
 
+set :required_remote_gems, ['thor']
+
 set :use_sudo, false
 
 set :deploy_to, "/home/#{user}/apps/#{application}"
@@ -53,11 +55,17 @@ namespace :deploy do
   task :migrations do 
     # nothing to do here for now
   end
+  
+  namespace :remote_gems do
+    task :install do
+      sudo "gem install #{required_remote_gems.join(' ')} --no-ri --no-rdoc"
+    end
+  end
 
 end
 
 after "deploy:setup" do
-  sudo "gem install thor rack --no-ri --no-rdoc"
+  deploy.remote_gems.install  
   run "mkdir -p #{shared_path}/gems"
   run "mkdir -p #{shared_path}/gems/gems"
   run "mkdir -p #{shared_path}/gems/specifications"
