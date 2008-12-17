@@ -34,30 +34,30 @@ end
 namespace :deploy do
 
   desc "Restart Merb" 
-  task :restart do  
+  task :restart, :role => :app do  
     run "touch #{release_path}/tmp/restart.txt"
   end
 
   desc "Start Merb"
-  task :start do
+  task :start, :role => :app do
     # nothing to do here for now
   end
 
   desc "Stop Merb"
-  task :stop do
+  task :stop, :role => :app do
     # nothing to do here for now
   end
   
-  task :migrate do
+  task :migrate, :role => :app do
     # nothing to do here for now
   end
   
-  task :migrations do 
+  task :migrations, :role => :app do 
     # nothing to do here for now
   end
   
   namespace :remote_gems do
-    task :install do
+    task :install, :role => :app do
       sudo "gem install #{required_remote_gems.join(' ')} --no-ri --no-rdoc"
     end
   end
