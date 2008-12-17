@@ -10,7 +10,7 @@ set :branch, "master"
 set :runner, user
 set :runner_admin, runner
 
-set :required_remote_gems, ['thor']
+set :required_remote_gems, ['thor', 'rake', 'rack']
 
 set :use_sudo, false
 
