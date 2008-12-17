@@ -2,6 +2,7 @@ require 'rubygems'
 
 $BUNDLE = true
 Gem.clear_paths
+gems_dir = File.expand_path(File.join(File.dirname(__FILE__),'gems'))
 Gem.path.replace([File.expand_path(gems_dir)])
 ENV["PATH"] = "#{File.dirname(__FILE__)}:#{ENV["PATH"]}"
 
