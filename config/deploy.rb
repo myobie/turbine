@@ -1,4 +1,4 @@
-require 'deploy/shared' # set user and host here (gitignore'd)
+load 'config/deploy/shared' # set user and host here (gitignore'd)
 
 set :application, "turbine"
 default_run_options[:pty] = true
