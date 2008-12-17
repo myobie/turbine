@@ -1,11 +1,11 @@
 require 'rubygems'
 
-Gem.clear_paths
 $BUNDLE = true
-gems_dir = File.expand_path(File.join(File.dirname(__FILE__),'gems'))
-Gem.path.unshift(gems_dir)
+Gem.clear_paths
+Gem.path.replace([File.expand_path(gems_dir)])
+ENV["PATH"] = "#{File.dirname(__FILE__)}:#{ENV["PATH"]}"
 
-# require File.join(File.dirname(__FILE__), "bin", "common")
+require File.join(File.dirname(__FILE__), "bin", "common")
 
 require 'merb-core'
  
