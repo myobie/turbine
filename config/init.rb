@@ -3,8 +3,8 @@
 require 'config/dependencies.rb'
  
 use_orm :datamapper
-use_test :rspec
-use_template_engine :erb
+use_test :bacon
+use_template_engine :haml
  
 Merb::Config.use do |c|
   c[:use_mutex] = false
