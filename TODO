@@ -1,0 +1,7 @@
+Parsing
+* simplify/dry up detect? functions
+* Move all the text parsing out of the PostType class (into string? or separate class?)
+
+Uploads
+* Make it possible to accept different file types somehow (images, etc) in the merb side?
+* Auto generate embed code?

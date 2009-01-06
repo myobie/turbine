@@ -1,7 +1,9 @@
 # Go to http://wiki.merbivore.com/pages/init-rb
- 
+
 require 'config/dependencies.rb'
- 
+
+Merb.push_path(:lib, Merb.root / "lib")
+
 use_orm :datamapper
 use_test :bacon
 use_template_engine :haml
@@ -21,4 +23,5 @@ end
  
 Merb::BootLoader.after_app_loads do
   # This will get executed after your app's classes have been loaded.
+  PostType.preferred_order = [Video, Audio, Photo, Chat, Review, Link, Quote, Article]
 end

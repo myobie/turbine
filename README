@@ -1,1 +1,115 @@
-...
+OK, so this is what I want this to be.
+
+What this isn't
+===============
+
+1) Turbine does not care about authentication. If you want that, use merb_auth. But, to be nice, there is support to load a yaml file with usernames/passwords listed for people to post using basic http auth. 
+
+2) Turbine will not have fancy templates. You create your own site. The defaults will be very minimal, but usable.
+
+3) Turbine is more about making it easy to post from anything than it is about offering approval workflows, site pages, etc. This thing is for having a blog. If you need other things, build on top of it.
+
+4) This is not a CMS.
+
+5) This does not integrate with any other services (yet).
+
+API
+===
+
+I want a blog with a decent api. Not this stupid xml-rpc crap or even atompub (although atompub is great, just not for me). Essentially, _I_ want to be able to post a text file (markdown) and have that create a post. I should be able to fricken post using curl if I want. Technically, turbine will expose a restful api and provide json, xml, html, and text (markdown) for all incoming/outgoing api requests. Turbine will not make assumptions about where the api data is going, just how to serialize in/out from a ruby Hash.
+
+What is a Post?
+===============
+
+A blog post is not a title and a body. It could be an article, a link, an audio file, a video, a photo, a review, an event, etc. Each type of post has one required field (example: link => url). Using json it's very easy to model each of these types of posts. With text (markdown), it's not as easy. So each format can have auto detectors (which will mainly be used by text/html) to detect what type of post is being submitted (unless a type is explicitly defined).
+
+A review might look like:
+
+    {
+      'item': 'Pert Plus',
+      'rating': 4.5,
+      'comments': "I really blah blah blah..."
+    }
+
+While a text (markdown) version would look like:
+
+    Item: Pert Plus
+    Rating: 4.5
+    
+    I really blah blah blah...
+
+The takeaway is that all text (markdown) documents begin with an attribute list. Each post type has a "primary field" which is used for any large block of text following the attribute set (in this case, comments).
+
+Post Types
+==========
+
+Post types are just classes that have one required field, an optional primary field, an optional heading field, and an optional text format auto-detector.
+
+    class Review < PostType
+      fields :reviewing, :is, :rating, :comments
+      required :rating
+      primary :comments
+      
+      def auto_detect(text)
+        # some text parsing and stuff here
+        # return true or false
+      end
+    end
+    
+    class Article < PostType
+      fields :title, :tags, :body
+      required :body
+      primary :body
+      heading :title # if the primary field starts with an <h1>, 
+                     # then it is used as the heading field 
+                     # (unless this field is already specified in the attribute list)
+      
+      def self.detect?(text)
+        # some text parsing and stuff here
+        # return true or false
+      end
+    end
+    
+An example article document:
+
+    Tags: cats, dogs, and stuff
+    
+    This would be the title
+    -----------------------
+    
+    And all of this would be the body.
+
+Default Fields
+==============
+
+All PostTypes have some fields built in: published_at, status, slug, tags, and trackbacks.
+
+An example article making use of these fields:
+
+    Published_At: Jan 20, 2050
+    Status: Private
+    Slug: an_awesome_article_horaaay
+    Trackbacks: http://www.example.com/trackback/5
+    Tags: awesomeness
+    
+    My Awesome Article
+    ------------------
+    
+    This is my...
+
+And doesn't that just look awesome. A complete blogging interface...in text.
+
+Storage
+=======
+
+By default, couchdb is used for storing posts. All that is needed from a storage solution is setting, getting, and listing (all and by date). MySQL and other storages will not be supported unless someone wants to do it. A full storage API will be developed by 1.0, so it shouldn't be hard. 
+
+Web UI
+======
+
+The API is first. There will be a web UI and it will use the text (markdown) api methods.
+
+Why
+===
+
+Because I am sick of poor blogging interfaces. 
