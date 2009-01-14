@@ -3,7 +3,7 @@ class Chat < PostType
   required :transcript
   
   # override commit_pairs to make chat transcripts form the Me: pairs stuff
-  def commit_pairs(pairs_array)
+  def commit_array(pairs_array)
     transcript = []
     
     pairs_array.each do |pairs_hash|

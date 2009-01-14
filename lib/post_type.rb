@@ -46,8 +46,8 @@ class PostType
     self.allowed_fields_list = [DEFAULT_FIELDS, list.make_attrs].flatten.uniq
   end
   
-  def self.allow_field(field)
-    self.allowed_fields_list = [self.allowed_fields_list, field.make_attr].flatten.uniq
+  def self.allow(*list)
+    self.allowed_fields_list = [self.allowed_fields_list, list.make_attrs].flatten.uniq
   end
   
   def self.required(*list)
@@ -84,7 +84,7 @@ class PostType
   def self.dynamic(field, &block)
     field = field.make_attr
     self.dynamic_blocks[field] = block
-    allow_field(field)
+    allow(field)
   end
   
   def self.markdown(*list)
@@ -192,9 +192,15 @@ class PostType
   end#of content=
   
   def valid? # TODO: this doesn't work if there are no required fields and the slug is not unique
-    !self.class.required_fields_list.blank? && 
-    self.class.required_fields_list.reject { |item| !get_attr(item).blank? }.blank? && 
-    slug_is_unique
+    v = true
+    
+    if self.class.required_fields_list.blank?
+      v = false unless self.class.required_fields_list.reject { |item| !get_attr(item).blank? }.blank?
+    end
+    
+    v = false unless slug_is_unique
+    
+    v
   end
   
   def initialize(text = nil)
@@ -214,90 +220,41 @@ class PostType
     end
   end
   
-  def import(stuff)
-    import_text(stuff) # TODO: make it possible to import other types
-  end
-
-  # TODO: move this to a from_text method on String
-  def import_text(text)
-    pairs, remainder = pull_pairs(text)
-    commit_pairs(pairs)
-    eval_primary_field(remainder) unless self.class.primary_field.blank?
-  end
-
-  def pull_pairs(text)
-    pairs = []
-    remainder = ''
-    last_pair_found = false
-  
-    text.each_line do |line|
+  # TODO: how to determine the type of stuff? (text, json, yaml, image, video, photo, pdf, generic download file (can lookup type of file for icon if needed))
+  def import(stuff, type = :text)
+    importer = Kernel.const_get(type.to_s.camel_case+'Importer').new(self.class)
     
-      unless last_pair_found
-        possible_pair = detect_pair(line)
-        if possible_pair and possible_pair.captures.length == 2
-          key = possible_pair.captures[0].downcase.to_sym
-          value = possible_pair.captures[1]
-          number_of_lines = value.count("\n") + 1
-          pairs << { key => value.strip }
-          next # don't put this in the remainder
-        else
-          last_pair_found = true
-        end#of if
-      end
+    # The result sent back by an importer is either:
+    #   Array:
+    #     [{ :one => 'stuff' }, { :two => 'stuff' }]
+    #   Hash:
+    #     { :one => 'stuff', :two => 'stuff' }
+    result = importer.import(stuff) 
     
-      remainder << line # keep this around, it might be useful
-    end#of each_line
-  
-    [pairs, remainder.strip]
-  end#of parse_pairs
-
-  def detect_pair(line)
-    line.strip.match(/(^[A-Za-z0-9_]+):(.+)/)
+    case result
+    when Array
+      commit_array(result)
+    when Hash
+      commit_hash(result)
+    end
   end
-
-  def commit_pairs(pairs_array)
+  
+  def commit_hash(pairs_hash)
+    pairs_hash.each do |key, value|
+      set_attr(key, value)
+    end
+  end
+  
+  def commit_array(pairs_array)
     pairs_array.each do |pairs_hash|
-      pairs_hash.each do |key, value|
-        set_attr(key, value)
-      end
+      commit_hash(pairs_hash)
     end
   end
-
-  def eval_primary_field(remainder)
-    remainder.strip!
-  
-    unless remainder.blank?
-      set_attr(self.class.primary_field, remainder)
-      eval_heading_field # there can only be a heading if there is a primary
-    end
-  end
-
-  def eval_heading_field
-    unless self.class.heading_field.blank?
-      # check for an <h1> at the beginning of the primary and if it's there pull it out for the heading
-      possible_hone = get_attr(self.class.primary_field).match(/^<h1>(.+)<\/h1>/)
-
-      if possible_hone and possible_hone.captures.length == 1
-        set_attr(self.class.heading_field, possible_hone.captures.first)
-      
-        ### Remove heading from text
-        new_text = get_attr(self.class.primary_field, false).
-                   strip.
-                   gsub(/^#{possible_hone.captures.first}\n=+\n*/, '').
-                   gsub(/^# #{possible_hone.captures.first}\w*\n*/, '').
-                   strip
-        
-        set_attr(self.class.primary_field, new_text)
-      end#of if
-    end#of unless
-  end#of eval_heading_field
 
   def eval_defaults
     if valid?
       self.class.defaults_blocks.each do |key, block|
-        if get_attr(key).blank?
-          set_attr(key, self.instance_eval(&block))
-        end
+        set_default(key, self.instance_eval(&block))
       end
     end
   end
@@ -338,7 +295,7 @@ class PostType
     result = ''
   
     unless self.class.always_use_uuid
-      result = get_attr(self.class.heading_field).to_s.dup unless self.class.heading_field.blank?
+      result = get_attr(self.class.heading_field, false).to_s.dup unless self.class.heading_field.blank?
   
       if result.blank?
         result = get_attr(self.class.primary_field, false).to_s.dup unless self.class.primary_field.blank?

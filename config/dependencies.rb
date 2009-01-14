@@ -26,3 +26,6 @@ dependency "dm-validations", dm_gems_version
 
 dependency "do_sqlite3", "0.9.9"
 dependency "data_objects", "0.9.9"
+
+dependency "bacon", "1.1"
+dependency "mocha", "0.9.0"
