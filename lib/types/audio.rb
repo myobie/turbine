@@ -4,7 +4,7 @@ class Audio < PostType
   primary :description
   
   def self.detect?(text)
-    pairs, remainder = new.pull_pairs(text)
+    pairs = TextImporter.new(self.class).import(text)
     audio_count = pairs.reject { |pair| pair.keys.first != :audio_url }
     audio_count.length == 1
   end

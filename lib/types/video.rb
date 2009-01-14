@@ -4,7 +4,7 @@ class Video < PostType
   primary :description
   
   def self.detect?(text)
-    pairs, remainder = new.pull_pairs(text)
+    pairs = TextImporter.new(self.class).import(text)
     video_count = pairs.reject { |pair| pair.keys.first != :video_url }
     video_count.length == 1
   end

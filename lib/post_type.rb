@@ -178,6 +178,8 @@ class PostType
   def self.auto_detect(text)
     list = self.preferred_order.blank? ? @all_children : self.preferred_order
     
+    # pairs = TextImporter.new(l.class).import(text)
+    
     list.each { |l| return l.new(text) if l.detect?(text) }
   end
   

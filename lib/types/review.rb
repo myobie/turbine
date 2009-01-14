@@ -9,12 +9,7 @@ class Review < PostType
   end
   
   def self.detect?(text)
-    one = new
-    pairs, remainder = one.pull_pairs(text)
-    one.content = ''
-    one.eval_primary_field(remainder)
-    pairs << { :item => one.content[:item] } unless one.content[:item].blank?
-    
+    pairs = TextImporter.new(self.class).import(text)
     required_count = pairs.reject { |pair| pair.keys.first != :rating && pair.keys.first != :item }
     required_count.length == 2
   end

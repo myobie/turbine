@@ -24,7 +24,7 @@ class Chat < PostType
   end#of commit_pairs
   
   def self.detect?(text)
-    pairs, remainder = new.pull_pairs(text)
+    pairs = TextImporter.new(self.class).import(text)
     me_count = pairs.reject { |pair| pair.keys.first != :me }
     me_count.length > 0
   end

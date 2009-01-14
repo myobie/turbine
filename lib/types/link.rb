@@ -21,7 +21,7 @@ class Link < PostType
   end
   
   def self.detect?(text)
-    pairs, remainder = new.pull_pairs(text)
+    pairs = TextImporter.new(self.class).import(text)
     url_count = pairs.reject { |pair| pair.keys.first != :url }
     url_count.length == 1
   end

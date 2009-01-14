@@ -12,12 +12,14 @@ class Quote < PostType
   end
   
   def self.detect?(text)
-    pairs, remainder = new.pull_pairs(text)
+    pairs = TextImporter.new(self.class).import(text)
     
-    markdown = Markdown.new(remainder.strip)
-    remainder_html = markdown.to_html.strip
+    the_quote = pairs.select { |pair| pair.keys.first == :quote }
+    
+    markdown = Markdown.new(the_quote[:quote])
+    quote_html = markdown.to_html.strip
     
     q_count = pairs.reject { |pair| pair.keys.first != :quote }
-    q_count.length == 1 || !(remainder_html =~ /^<blockquote(.+)<\/blockquote>$/m).nil?
+    q_count.length == 1 || !(quote_html =~ /^<blockquote(.+)<\/blockquote>$/m).nil?
   end
 end
