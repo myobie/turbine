@@ -1,11 +1,7 @@
-* Spec out the post_type stuff
 * Get a controller that will take text in and make a hash out of it
 * Get a storage class setup
 * Get it to save
 * Get it to retrieve
-
-Parsing
-* simplify/dry up detect? functions
 
 Uploads
 * Make it possible to accept different file types somehow (images, etc) in the merb side?
