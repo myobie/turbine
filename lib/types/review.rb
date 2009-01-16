@@ -9,8 +9,6 @@ class Review < PostType
   end
   
   def self.detect?(text)
-    pairs = TextImporter.new(self.class).import(text)
-    required_count = pairs.reject { |pair| pair.keys.first != :rating && pair.keys.first != :item }
-    required_count.length == 2
+    has_required? text
   end
 end

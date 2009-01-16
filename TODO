@@ -1,5 +1,4 @@
 * Spec out the post_type stuff
-* Change it to where all the text processing takes place in it's own class
 * Get a controller that will take text in and make a hash out of it
 * Get a storage class setup
 * Get it to save

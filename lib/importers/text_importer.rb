@@ -77,33 +77,37 @@ class TextImporter
   end#of eval_heading_field
   
   def save_primary
-    # see if a pair already exists for the primary_field
-    existing_primary = @result.select { |pair| pair.keys.first == @type.primary_field }
-    existing_primary = existing_primary.first
+    unless @primary.blank?
+      # see if a pair already exists for the primary_field
+      existing_primary = @result.select { |pair| pair.keys.first == @type.primary_field }
+      existing_primary = existing_primary.first
     
-    # get rid of the primary_field if it's already there
-    @result.delete(existing_primary)
+      # get rid of the primary_field if it's already there
+      @result.delete(existing_primary)
     
-    # if there was any existing, prepend it to remanding
-    @primary = existing_primary.to_s + @primary unless existing_primary.blank?
+      # if there was any existing, prepend it to remanding
+      @primary = existing_primary.to_s + @primary unless existing_primary.blank?
     
-    # append a new pair for the fields
-    @result << { @type.primary_field => @primary } unless @primary.blank?
+      # append a new pair for the fields
+      @result << { @type.primary_field => @primary } unless @primary.blank?
+    end
   end
   
   def save_heading
-    # see if a pair already exists for the primary_field
-    existing_heading = @result.select { |pair| pair.keys.first == @type.heading_field }
-    existing_heading = existing_heading.first
+    unless @heading.blank?
+      # see if a pair already exists for the primary_field
+      existing_heading = @result.select { |pair| pair.keys.first == @type.heading_field }
+      existing_heading = existing_heading.first
     
-    # get rid of the primary_field if it's already there
-    @result.delete(existing_heading)
+      # get rid of the primary_field if it's already there
+      @result.delete(existing_heading)
     
-    # if there was any existing, prepend it to remanding
-    @heading = existing_heading.to_s + @heading unless existing_heading.blank?
+      # if there was any existing, prepend it to remanding
+      @heading = existing_heading.to_s + @heading unless existing_heading.blank?
     
-    # append a new pair for the fields
-    @result << { @type.heading_field => @heading } unless @heading.blank?
+      # append a new pair for the fields
+      @result << { @type.heading_field => @heading } unless @heading.blank?
+    end
   end
   
 end

@@ -10,7 +10,7 @@ class Chat < PostType
       
       pairs_hash.each do |key, value|
         
-        unless self.class.fields_list.include?(key)
+        unless self.class.allowed_fields_list.include?(key)
           transcript << { key => value }
         else
           set_attr(key, value)
@@ -24,8 +24,6 @@ class Chat < PostType
   end#of commit_pairs
   
   def self.detect?(text)
-    pairs = TextImporter.new(self.class).import(text)
-    me_count = pairs.reject { |pair| pair.keys.first != :me }
-    me_count.length > 0
+    has_one_or_more? text, :me
   end
 end#of Chat

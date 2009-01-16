@@ -145,40 +145,58 @@ class PostType
   alias :del_attr :delete_attr
   
   # can be overriden to provide auto detection of type from a block of text
+  #
+  # Examples:
+  #   def self.detect?(text)
+  #     has_keys? text, :title, :body
+  #   end
+  #
+  #   def self.detect?(text)
+  #     has_required? text
+  #   end
+  #
+  #   def self.detect?(text)
+  #     has_one_or_more? text, :me
+  #   end
+  #
   def self.detect?(text)
     false
   end
   
-  # def self.has_keys?(text, *keys)
-  #   count = keys.length
-  #   
-  #   one = new
-  #   pairs, remainder = one.pull_pairs(text)
-  #   
-  #   unless one.class.primary_field.blank?
-  #     one.content = ''
-  #     one.eval_primary_field(remainder)
-  #     pairs << { :"#{one.class.heading_field}" => one.content[:"#{one.class.heading_field}"] } unless one.content[:"#{one.class.heading_field}"].blank?
-  #   end
-  #   
-  #   required_count = pairs.reject { |pair| 
-  #     answers = []
-  #     
-  #     keys.each do |key| 
-  #       answers << pair.keys.first != key
-  #     end
-  #     
-  #     answers.all?
-  #   }
-  #   
-  #   required_count.length == count
-  # end
+  # useful for detection
+  def self.has_keys?(text, *fields)
+    needed = fields.make_attrs
+    get_pairs_count(text, needed).length == needed.length
+  end
+  
+  def self.has_more_than_one?(text, field)
+    has_more_than? text, field, 1
+  end
+  
+  def self.has_one_or_more?(text, field)
+    has_more_than? text, field, 0
+  end
+  
+  def self.has_more_than?(text, field, amount)
+    get_pairs_count(text, [field]).length > amount
+  end
+  
+  def self.get_pairs(text)
+    TextImporter.new(self).import(text)
+  end
+  
+  def self.get_pairs_count(text, fields)
+    pairs = get_pairs(text)
+    pairs.reject { |pair| !fields.include?(pair.keys.first) }
+  end
+  
+  def self.has_required?(text)
+    has_keys? text, *self.required_fields_list
+  end
   
   # runs through the list of children looking for one that will work
   def self.auto_detect(text)
     list = self.preferred_order.blank? ? @all_children : self.preferred_order
-    
-    # pairs = TextImporter.new(l.class).import(text)
     
     list.each { |l| return l.new(text) if l.detect?(text) }
   end

@@ -1,11 +1,10 @@
 class Video < PostType
-  fields :video_url, :description, :embed
+  fields :video_url, :title, :description, :embed
   required :video_url
   primary :description
+  heading :title
   
   def self.detect?(text)
-    pairs = TextImporter.new(self.class).import(text)
-    video_count = pairs.reject { |pair| pair.keys.first != :video_url }
-    video_count.length == 1
+    has_required? text
   end
 end

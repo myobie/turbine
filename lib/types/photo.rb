@@ -4,8 +4,6 @@ class Photo < PostType
   primary :caption
   
   def self.detect?(text)
-    pairs = TextImporter.new(self.class).import(text)
-    photo_count = pairs.reject { |pair| pair.keys.first != :photo_url }
-    photo_count.length == 1
+    has_required? text
   end
 end
