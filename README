@@ -1,17 +1,13 @@
-OK, so this is what I want this to be.
-
 What this isn't
 ===============
 
 1) Turbine does not care about authentication. If you want that, use merb_auth. But, to be nice, there is support to load a yaml file with usernames/passwords listed for people to post using basic http auth. 
 
-2) Turbine will not have fancy templates. You create your own site. The defaults will be very minimal, but usable.
+2) Turbine will not have fancy templates. You create your own site. The default views will be very minimal, but usable.
 
-3) Turbine is more about making it easy to post from anything than it is about offering approval workflows, site pages, etc. This thing is for having a blog. If you need other things, build on top of it.
+3) Turbine is more about making it easy to post from anything/anywhere than it is about offering approval workflows, site pages, etc. This thing is for having a blog/tumblog/lifestream. If you need other things, build on top of it.
 
 4) This is not a CMS.
-
-5) This does not integrate with any other services (yet).
 
 API
 ===
@@ -67,6 +63,8 @@ Post types are just classes that have one required field, an optional primary fi
       def self.detect?(text)
         # some text parsing and stuff here
         # return true or false
+        
+        has_keys? text, :body, :title
       end
     end
     
